@@ -1,0 +1,5 @@
+[["addus-site-1" :site/url "https://www.addus.com" 1 :add]
+ ["addus-site-1" :site/checked-at "2026-07-18" 1 :add]
+ ["addus-site-1" :site/http-status 200 1 :add]
+ ["addus-site-1" :site/title "Addus HomeCare | In Home Care, Home Health &amp; Hospice Care Agency" 1 :add]
+ ["addus-site-1" :site/description "Our caregivers provide quality in-home supportive services so you can remain in your home, comfortably and confidently. Let’s talk." 1 :add]]
