@@ -2,4 +2,5 @@
  :company/lei "52990090ZT33AKPDBX62"
  :company/jurisdiction "US-DE"
  :company/website "https://www.addus.com"
- :company/ticker "ADUS (NASDAQ)"}
+ :company/ticker "ADUS (NASDAQ)"
+ :itonami.blueprint/maturity :implemented}
