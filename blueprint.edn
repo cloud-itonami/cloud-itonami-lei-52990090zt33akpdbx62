@@ -3,4 +3,6 @@
  :company/jurisdiction "US-DE"
  :company/website "https://www.addus.com"
  :company/ticker "ADUS (NASDAQ)"
- :itonami.blueprint/maturity :implemented}
+ :itonami.blueprint/maturity :implemented
+ :company/phone "888.233.8746"
+ :company/profile-note "published on the company's own site (https://addus.com/), retrieved 2026-08-04T07:40:43.507Z by scripts/lei-profile-enrich.cljs (GET only)"}
