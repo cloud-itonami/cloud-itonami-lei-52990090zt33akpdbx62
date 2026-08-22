@@ -1,0 +1,384 @@
+;; Verified public-register citations for the legal entity archived by this repository.
+;;
+;; Every row is checked live by tools/verify_citations.cljs:
+;;   * GET :cite/url must answer HTTP 2xx
+;;   * :cite/expect-substring must appear in the response body
+;;
+;; A URL that cannot be fetched, or whose body no longer carries the claim, is a
+;; DRIFT and fails the gate. Nothing is recorded here that was not retrieved.
+;;
+;; FOUR independent authorities are cited, not one:
+;;   * GLEIF, the global LEI system (the entity record, the RA000602 entry in the
+;;     registration-authorities registry, the XTIQ entry in the entity-legal-forms
+;;     registry, and the LEI record of the managing LOU)
+;;   * the United States, via the SEC's EDGAR submissions API (the ACTIVE NASDAQ
+;;     filer, CIK 0001468328 -- 10-K, 10-Q, 8-K, DEF 14A)
+;;   * the State of Delaware, via the Division of Corporations portal at
+;;     corp.delaware.gov -- the very register RA000602 names (portal only; see
+;;     below for why no per-entity row exists)
+;;   * the issuer itself, at its corporate site and at the exact Terms-of-Use
+;;     page this repository archives in 80-data/public/tos.journal.edn
+;;
+;; HOW GLEIF AND DELAWARE ARE LINKED -- BY SHARED KEY, RESOLVED ONE WAY ONLY.
+;; GLEIF names RA000602 (Division of Corporations, Department of State,
+;; Delaware) as both register of record and validation authority, and records
+;; registeredAs 4196548 and validatedAs 4196548 -- the Delaware file number.
+;; The same digits reappear inside GLEIF's OpenCorporates pointer
+;; ocid us_de/4196548 (row gleif-ocid). But unlike Japan's NTA in the sibling
+;; NTT catalog, Delaware exposes NO stable public per-entity URL: the ICIS
+;; entity search at icis.corp.delaware.gov is form-gated. So the file number
+;; can be READ OUT of GLEIF but not RESOLVED at the register itself by this
+;; gate -- the corp.delaware.gov rows are :definition (the register exists),
+;; not :identity (the register names this entity).
+;;
+;; HOW GLEIF AND THE SEC ARE LINKED -- BY ATTRIBUTES, NOT BY KEY. EDGAR still
+;; carries "lei":null for this filer (row sec-lei-null, which goes red the day
+;; EDGAR starts printing the LEI, at which point a direct-key row should
+;; replace it). The link is: the name (ADDUS HOMECARE CORPORATION / Addus
+;; HomeCare Corp), the state of incorporation DE (row sec-state-of-inc,
+;; matching GLEIF's jurisdiction US-DE), and the headquarters city FRISCO,
+;; TX 75034 -- attributes in agreement, no register quoting another.
+;;
+;; THE STALE ADDRESS, RECORDED HONESTLY. GLEIF's registration status is LAPSED
+;; (row gleif-registration-lapsed): nextRenewalDate passed 2020-02-22 and the
+;; record was last updated 2021-07-15. GLEIF's headquarters row still reads
+;; 6801 Gaylord Parkway, Suite 110, Frisco TX 75034 (row gleif-hq-street).
+;; EDGAR, kept current by the filer's own submissions, reads 6303 COWBOYS WAY,
+;; SUITE 600, FRISCO TX 75034 (rows sec-street, sec-city, sec-zip). Same city,
+;; same ZIP, different street: the company moved and the lapsed GLEIF record
+;; never followed. Both are cited BECAUSE they disagree -- the disagreement is
+;; itself a dated, verifiable fact about register freshness, and either row
+;; going red signals one register catching up.
+;;
+;; WHAT IS DELIBERATELY NOT CITED. GLEIF's nextRenewalDate is frozen in the
+;; lapsed record and would prove nothing but the lapse already pinned by row
+;; gleif-registration-lapsed. NASDAQ's own quote page for ADUS is JS-rendered
+;; with no stable server-rendered bytes, so the listing is instead proven
+;; directly at EDGAR (rows sec-ticker, sec-exchange) -- a direct proof the
+;; sibling NTT catalog could not make for its TSE ticker. OpenCorporates
+;; blocks unauthenticated fetches; row gleif-ocid pins only GLEIF's POINTER at
+;; it, not the OpenCorporates page. The IRS has no public per-EIN URL, so EIN
+;; 20-5340172 is proven at EDGAR only (row sec-ein). The ICIS per-entity
+;; extract is form-gated (see above). The EDGAR body also carries a filings
+;; list that changes with every filing; rows target only stable header fields.
+;; The registered agent c/o CORPORATION SERVICE COMPANY, 251 LITTLE FALLS
+;; DRIVE, WILMINGTON (rows gleif-registered-agent, gleif-legal-city) is CSC's
+;; address, shared with thousands of Delaware registrants -- both rows are
+;; :attribute, not :identity, for exactly that reason.
+;;
+;; :cite/row-kind is the honest part of this catalog and should be read before
+;; the claims:
+;;
+;;   :identity   the substring names this entity, its identifiers, or its seat.
+;;               Point the URL at a different company and the row fails.
+;;   :attribute  the substring is TRUE OF THIS ENTITY BUT NOT ONLY OF IT
+;;               (status ACTIVE, city FRISCO, SIC 8082, a registered-agent
+;;               address shared across a state). Such a row can survive a swap
+;;               to a similar company. It is recorded because it corroborates,
+;;               not because it identifies.
+;;   :definition the substring resolves a code or body the entity record points
+;;               at (RA000602, XTIQ, the managing LOU, the registry portal). It
+;;               says the named register, legal form or LOU exists; it says
+;;               nothing about Addus by itself.
+;;
+;; Of the entries below, 14 are :identity, 20 are :attribute and 8 are
+;; :definition. A reader who treats all 42 as identifying would overstate what
+;; this catalog proves -- which is the error this field exists to prevent.
+;;
+;; Substrings are taken from the RAW response body (GLEIF JSON escapes forward
+;; slashes, so rows over URLs and the ocid pin the literal backslash-slash
+;; bytes; EDGAR JSON is compact ASCII; the issuer HTML serves UTF-8 with
+;; typographic quotes, pinned as-is) and were each checked against the fetched
+;; bytes before this file was written (2026-08-22).
+{:catalog/subject
+ #:company{:legal-name "ADDUS HOMECARE CORPORATION"
+           :lei "52990090ZT33AKPDBX62"
+           :jurisdiction "US-DE"
+           :registered-at "RA000602"
+           :registered-as "4196548"
+           :legal-form "XTIQ"
+           :sec-cik "0001468328"
+           :ein "20-5340172"
+           :ticker "ADUS (Nasdaq; rows sec-ticker, sec-exchange)"
+           :website "https://www.addus.com"}
+ :catalog/authorities
+ [{:authority/id :gleif
+   :authority/name "Global Legal Entity Identifier Foundation"
+   :authority/root "https://api.gleif.org/"}
+  {:authority/id :us-sec
+   :authority/name "U.S. Securities and Exchange Commission, EDGAR submissions API"
+   :authority/root "https://data.sec.gov/"}
+  {:authority/id :us-de
+   :authority/name "State of Delaware, Division of Corporations, Department of State"
+   :authority/root "https://corp.delaware.gov/"}
+  {:authority/id :issuer
+   :authority/name "Addus HomeCare Corporation (the issuer's own published pages)"
+   :authority/root "https://www.addus.com/"}]
+ :catalog/entries
+ [
+  ;; ── GLEIF, the entity record ──────────────────────────────────────────
+  {:cite/id "gleif-lei"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"lei\":\"52990090ZT33AKPDBX62\""
+   :cite/claim "GLEIF issues LEI 52990090ZT33AKPDBX62."}
+  {:cite/id "gleif-legal-name"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"name\":\"ADDUS HOMECARE CORPORATION\""
+   :cite/claim "GLEIF records the legal name ADDUS HOMECARE CORPORATION (en-US)."}
+  {:cite/id "gleif-registered-as"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"registeredAs\":\"4196548\""
+   :cite/claim "Delaware file number 4196548 -- the register-of-record key. Delaware's ICIS search is form-gated, so this key is read out of GLEIF but cannot be resolved at the register by this gate (see header)."}
+  {:cite/id "gleif-validated-as"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"validatedAs\":\"4196548\""
+   :cite/claim "GLEIF validated the record against the SAME Delaware file number, not merely recorded it."}
+  {:cite/id "gleif-ocid"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"ocid\":\"us_de\\/4196548\""
+   :cite/claim "GLEIF's OpenCorporates pointer us_de/4196548 embeds the same Delaware file number (raw JSON escapes the slash; this row pins the literal backslash-slash bytes). It proves GLEIF's pointer, not the OpenCorporates page."}
+  {:cite/id "gleif-jurisdiction"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"jurisdiction\":\"US-DE\""
+   :cite/claim "Jurisdiction US-DE -- shared with every Delaware registrant; corroborated by EDGAR's stateOfIncorporation DE (row sec-state-of-inc)."}
+  {:cite/id "gleif-ra-pointer"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"id\":\"RA000602\""
+   :cite/claim "The record points at registration authority RA000602 (as registeredAt AND validatedAt). Rows ra-name, ra-website, ra-jurisdiction resolve the code."}
+  {:cite/id "gleif-legal-form-pointer"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"id\":\"XTIQ\""
+   :cite/claim "The record points at entity legal form XTIQ. Rows elf-code, elf-name resolve it to Delaware Corporation."}
+  {:cite/id "gleif-entity-status"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"status\":\"ACTIVE\""
+   :cite/claim "Entity status ACTIVE -- the LEGAL ENTITY is active even though the LEI REGISTRATION is lapsed (next row). The two statuses are different fields and this catalog pins both."}
+  {:cite/id "gleif-registration-lapsed"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"status\":\"LAPSED\""
+   :cite/claim "Registration status LAPSED (renewal passed 2020-02-22, last update 2021-07-15). This is why GLEIF's street address trails EDGAR's (see header). The row goes red the day the registration is renewed -- at which point the address rows should be re-verified."}
+  {:cite/id "gleif-managing-lou"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"managingLou\":\"5299000J2N45DDNE4Y28\""
+   :cite/claim "The managing LOU is 5299000J2N45DDNE4Y28. Rows lou-lei, lou-name resolve it to WM Datenservice (Herausgebergemeinschaft Wertpapier-Mitteilungen)."}
+  {:cite/id "gleif-corroboration"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"corroborationLevel\":\"FULLY_CORROBORATED\""
+   :cite/claim "GLEIF marks the record FULLY_CORROBORATED against RA000602 -- corroborated AT VALIDATION TIME; the lapse row bounds how current that is."}
+  {:cite/id "gleif-registered-agent"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"addressLines\":[\"c\\/o CORPORATION SERVICE COMPANY, 251 LITTLE FALLS DRIVE\"]"
+   :cite/claim "The legal (registered-office) address is the registered agent CSC at 251 Little Falls Drive -- an address shared with thousands of Delaware registrants, which is why this row is :attribute and not :identity. Raw JSON escapes the slash in c/o; this row pins the literal bytes."}
+  {:cite/id "gleif-legal-city"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"city\":\"WILMINGTON\""
+   :cite/claim "Registered-office city WILMINGTON -- true of most CSC-agented Delaware corporations, recorded as corroboration only."}
+  {:cite/id "gleif-hq-street"
+   :cite/authority :gleif
+   :cite/row-kind :identity
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"addressLines\":[\"6801 Gaylord Parkway, Suite 110\"]"
+   :cite/claim "GLEIF's headquarters street is 6801 Gaylord Parkway, Suite 110 -- the FORMER seat, retained by the lapsed record. EDGAR's current street is 6303 Cowboys Way (row sec-street). Cited because the registers disagree, not despite it (see header)."}
+  {:cite/id "gleif-hq-city"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"city\":\"Frisco\""
+   :cite/claim "Headquarters city Frisco (TX) -- agrees with EDGAR's FRISCO (row sec-city) across the street-level disagreement."}
+  {:cite/id "gleif-hq-postal"
+   :cite/authority :gleif
+   :cite/row-kind :attribute
+   :cite/url "https://api.gleif.org/api/v1/lei-records/52990090ZT33AKPDBX62"
+   :cite/expect-substring "\"postalCode\":\"75034\""
+   :cite/claim "Headquarters ZIP 75034 -- agrees with EDGAR's zipCode 75034 (row sec-zip)."}
+
+  ;; ── GLEIF, the registration-authorities registry ──────────────────────
+  {:cite/id "ra-name"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000602"
+   :cite/expect-substring "\"internationalOrganizationName\":\"Division of Corporations, Department of State\""
+   :cite/claim "RA000602 is the Division of Corporations, Department of State. Says the register exists; says nothing about Addus by itself."}
+  {:cite/id "ra-website"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000602"
+   :cite/expect-substring "\"website\":\"https:\\/\\/corp.delaware.gov\\/\""
+   :cite/claim "GLEIF names corp.delaware.gov as RA000602's website -- the site row de-portal fetches. Raw JSON escapes the slashes; this row pins the literal bytes."}
+  {:cite/id "ra-jurisdiction"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/registration-authorities/RA000602"
+   :cite/expect-substring "\"jurisdiction\":\"Delaware\""
+   :cite/claim "RA000602's jurisdiction is Delaware, United States."}
+
+  ;; ── GLEIF, the entity-legal-forms registry ────────────────────────────
+  {:cite/id "elf-code"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/entity-legal-forms/XTIQ"
+   :cite/expect-substring "\"subdivisionCode\":\"US-DE\""
+   :cite/claim "ELF code XTIQ belongs to the US-DE subdivision -- the same jurisdiction the entity record claims."}
+  {:cite/id "elf-name"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/entity-legal-forms/XTIQ"
+   :cite/expect-substring "\"localName\":\"Corporation\""
+   :cite/claim "XTIQ resolves to the legal form Corporation (Delaware)."}
+
+  ;; ── GLEIF, the managing LOU's own LEI record ──────────────────────────
+  {:cite/id "lou-lei"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5299000J2N45DDNE4Y28"
+   :cite/expect-substring "\"lei\":\"5299000J2N45DDNE4Y28\""
+   :cite/claim "The managing LOU's LEI record exists."}
+  {:cite/id "lou-name"
+   :cite/authority :gleif
+   :cite/row-kind :definition
+   :cite/url "https://api.gleif.org/api/v1/lei-records/5299000J2N45DDNE4Y28"
+   :cite/expect-substring "Herausgebergemeinschaft Wertpapier-Mitteilungen"
+   :cite/claim "The managing LOU is Herausgebergemeinschaft Wertpapier-Mitteilungen Keppler, Lehmann GmbH & Co. KG (WM Datenservice). Proves who manages the record, not anything about Addus."}
+
+  ;; ── the SEC, EDGAR submissions API ────────────────────────────────────
+  {:cite/id "sec-cik"
+   :cite/authority :us-sec
+   :cite/row-kind :identity
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"cik\":\"0001468328\""
+   :cite/claim "EDGAR serves the filer CIK 0001468328."}
+  {:cite/id "sec-name"
+   :cite/authority :us-sec
+   :cite/row-kind :identity
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"name\":\"Addus HomeCare Corp\""
+   :cite/claim "EDGAR names the filer Addus HomeCare Corp -- the name half of the GLEIF<->SEC attribute link (there is no key link; see row sec-lei-null)."}
+  {:cite/id "sec-ticker"
+   :cite/authority :us-sec
+   :cite/row-kind :identity
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"tickers\":[\"ADUS\"]"
+   :cite/claim "EDGAR lists the ticker ADUS -- the direct listing proof the sibling NTT catalog could not make for its exchange."}
+  {:cite/id "sec-exchange"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"exchanges\":[\"Nasdaq\"]"
+   :cite/claim "EDGAR lists the exchange Nasdaq for that ticker."}
+  {:cite/id "sec-state-of-inc"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"stateOfIncorporation\":\"DE\""
+   :cite/claim "EDGAR records incorporation in DE -- the jurisdiction half of the GLEIF<->SEC attribute link (GLEIF row gleif-jurisdiction)."}
+  {:cite/id "sec-ein"
+   :cite/authority :us-sec
+   :cite/row-kind :identity
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"ein\":\"205340172\""
+   :cite/claim "EDGAR records EIN 20-5340172. The IRS has no public per-EIN URL, so EDGAR is the only register this catalog can pin the EIN at."}
+  {:cite/id "sec-lei-null"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"lei\":null"
+   :cite/claim "EDGAR does NOT carry the LEI -- the GLEIF<->SEC link is by name + state + seat, not by key. This row goes red the day EDGAR prints the LEI, at which point a direct-key row should replace it."}
+  {:cite/id "sec-sic"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"sic\":\"8082\""
+   :cite/claim "SIC 8082 -- shared with every home-health filer, recorded as corroboration of the line of business."}
+  {:cite/id "sec-sic-desc"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"sicDescription\":\"Services-Home Health Care Services\""
+   :cite/claim "EDGAR resolves SIC 8082 to Services-Home Health Care Services."}
+  {:cite/id "sec-street"
+   :cite/authority :us-sec
+   :cite/row-kind :identity
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"street1\":\"6303 COWBOYS WAY\""
+   :cite/claim "EDGAR's business street is 6303 COWBOYS WAY (Suite 600) -- the CURRENT seat, ahead of GLEIF's lapsed 6801 Gaylord Parkway (row gleif-hq-street)."}
+  {:cite/id "sec-city"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"city\":\"FRISCO\""
+   :cite/claim "EDGAR's business city FRISCO -- agrees with GLEIF's Frisco across the street-level disagreement."}
+  {:cite/id "sec-zip"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"zipCode\":\"75034\""
+   :cite/claim "EDGAR's business ZIP 75034 -- agrees with GLEIF's postalCode 75034."}
+  {:cite/id "sec-phone"
+   :cite/authority :us-sec
+   :cite/row-kind :attribute
+   :cite/url "https://data.sec.gov/submissions/CIK0001468328.json"
+   :cite/expect-substring "\"phone\":\"469-535-8200\""
+   :cite/claim "EDGAR records the business phone 469-535-8200. Distinct from the toll-free 888.233.8746 the issuer publishes (row issuer-phone) -- two numbers, two sources, both live."}
+
+  ;; ── the State of Delaware, register portal ────────────────────────────
+  {:cite/id "de-portal"
+   :cite/authority :us-de
+   :cite/row-kind :definition
+   :cite/url "https://corp.delaware.gov/"
+   :cite/expect-substring "Division of Corporations"
+   :cite/claim "The register RA000602 names answers and identifies itself. Its ICIS entity search is form-gated with no stable per-entity URL, so no row can cite the registry extract for file number 4196548 itself (see header)."}
+
+  ;; ── the issuer's own published pages ──────────────────────────────────
+  {:cite/id "issuer-site-title"
+   :cite/authority :issuer
+   :cite/row-kind :identity
+   :cite/url "https://www.addus.com"
+   :cite/expect-substring "Addus HomeCare | In Home Care, Home Health &amp; Hospice Care Agency"
+   :cite/claim "The website blueprint.edn claims answers under the Addus HomeCare name and line of business."}
+  {:cite/id "issuer-phone"
+   :cite/authority :issuer
+   :cite/row-kind :attribute
+   :cite/url "https://www.addus.com"
+   :cite/expect-substring "888.233.8746"
+   :cite/claim "The issuer publishes the toll-free number 888.233.8746 -- the number blueprint.edn records from this same page."}
+  {:cite/id "issuer-tos-title"
+   :cite/authority :issuer
+   :cite/row-kind :identity
+   :cite/url "https://addus.com/terms-of-use/"
+   :cite/expect-substring "<title>Terms of use - Addus HomeCare"
+   :cite/claim "The exact page 80-data/public/tos.journal.edn archives (:tos/source-url https://addus.com/terms-of-use/, retrieved 2026-07-10) is still live under the same title."}
+  {:cite/id "issuer-tos-identity"
+   :cite/authority :issuer
+   :cite/row-kind :identity
+   :cite/url "https://addus.com/terms-of-use/"
+   :cite/expect-substring "Addus HomeCare (“Addus” or “we”)"
+   :cite/claim "The Terms of Use name their own party as Addus HomeCare -- pinned with the page's typographic quotes as served."}
+  ]}
